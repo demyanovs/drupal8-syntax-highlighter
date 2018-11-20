@@ -32,10 +32,23 @@ class SettingsForm extends ConfigFormBase
      */
     public function buildForm(array $form, FormStateInterface $form_state)
     {
-
-
         $config = $this->config('code_highlighter.settings');
-        var_dump($config->get('welcome_message'));
+
+        $types = \Drupal::entityTypeManager()
+            ->getStorage('node_type')
+            ->loadMultiple();
+
+        foreach($types as $type) {
+            $content_types[$type->id()] = $type->label();
+        }
+
+        $form['enabled_content_types'] = [
+            '#type' => 'checkboxes',
+            '#title' => 'Enabled Content Types',
+            '#description' => 'Use highlighter for all enabled content types only',
+            '#options' => $content_types,
+            '#default_value' => $config->get('enabled_content_types'),
+        ];
 
         $form['welcome_message'] = [
             '#type' => 'textarea',
@@ -56,7 +69,11 @@ class SettingsForm extends ConfigFormBase
         $this->configFactory->getEditable('code_highlighter.settings')
             // Set the submitted configuration setting
             ->set('welcome_message', $form_state->getValue('welcome_message'))
+            ->set('enabled_content_types', $form_state->getValue('enabled_content_types'))
             ->save();
+
+        var_dump($form_state->getValue('enabled_content_types'));
+        //exit();
 
         parent::submitForm($form, $form_state);
     }
