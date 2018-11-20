@@ -1,0 +1,12 @@
+code_highlighter.admin_config:
+ title: 'Highlighter'
+ parent: system.admin_config
+ route_name: code_highlighter.admin_config
+ weight: -50
+
+code_highlighter.admin_settings:
+ title: 'Highlighter settings'
+ description: 'In this settings you can code highlighter settings.'
+ parent: code_highlighter.admin_config
+ route_name: code_highlighter.admin_settings
+ weight: 1
