@@ -38,6 +38,7 @@ class SettingsForm extends ConfigFormBase
             ->getStorage('node_type')
             ->loadMultiple();
 
+        $content_types = [];
         foreach($types as $type) {
             $content_types[$type->id()] = $type->label();
         }
@@ -45,7 +46,7 @@ class SettingsForm extends ConfigFormBase
         $form['enabled_content_types'] = [
             '#type' => 'checkboxes',
             '#title' => 'Enabled Content Types',
-            '#description' => 'Use highlighter for all enabled content types only',
+            '#description' => 'Use CodeHighlighter for all enabled content types only',
             '#options' => $content_types,
             '#default_value' => $config->get('enabled_content_types'),
         ];

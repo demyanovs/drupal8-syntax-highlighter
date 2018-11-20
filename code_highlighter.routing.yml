@@ -2,7 +2,7 @@ code_highlighter.admin_config:
  path: '/admin/config/code-highlighter'
  defaults:
    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
-   _title: 'Settings for code highlighter'
+   _title: 'CodeHighlighter'
  requirements:
    _permission: 'access administration pages'
 
