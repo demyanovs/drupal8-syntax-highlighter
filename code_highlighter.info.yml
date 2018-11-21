@@ -1,6 +1,6 @@
 name: Code Highlighter
 type: module
-description: "Module for highlighting code"
+description: "Module for highlighting syntax"
 package: custom
 core: 8.x
 project: 'code_highlighter'
