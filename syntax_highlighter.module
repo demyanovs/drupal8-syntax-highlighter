@@ -1,0 +1,32 @@
+<?php
+
+require_once 'src/autoload.php';
+require_once 'src/PHPHighlight/Themes/Theme.php';
+
+use PHPHighlight\Highlighter;
+
+/**
+ * @param array $build
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+ * @param $view_mode
+ */
+function syntax_highlighter_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode)
+{
+    $config = \Drupal::config('syntax_highlighter.settings')->getOriginal('settings', FALSE);
+    $text = str_replace('&gt;', '>', $build['body'][0]['#text']);
+
+    $highlighter = new Highlighter($text, 'railscasts');
+    $highlighter->setShowLineNumbers(isset($config['show_line_numbers']) && $config['show_line_numbers'] ? true : false);
+    $highlighter->setShowActionPanel(isset($config['show_action_panel']) && $config['show_action_panel'] ? true : false);
+
+    $build['body'][0]['#text'] = $highlighter->parse();;
+}
+
+/**
+ * @param array $page
+ */
+function syntax_highlighter_page_attachments(array &$page)
+{
+    $page['#attached']['library'][] = 'syntax_highlighter/syntax_highlighter';
+}

@@ -1,0 +1,8 @@
+name: Syntax highlighter
+type: module
+description: "Module for highlighting syntax"
+package: custom
+core: 8.x
+project: 'syntax_highlighter'
+
+configure: syntax_highlighter.admin_settings

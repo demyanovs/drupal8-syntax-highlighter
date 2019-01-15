@@ -1,0 +1,5 @@
+syntax_highlighter:
+  version: 1.x
+  css:
+    theme:
+      css/highlighter.css: {}

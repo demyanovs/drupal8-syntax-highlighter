@@ -1,0 +1,15 @@
+syntax_highlighter.admin_config:
+ path: '/admin/config/syntax-highlighter'
+ defaults:
+   _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+   _title: 'SyntaxHighlighter'
+ requirements:
+   _permission: 'access administration pages'
+
+syntax_highlighter.admin_settings:
+ path: '/admin/config/syntax-highlighter/settings'
+ defaults:
+   _form: '\Drupal\syntax_highlighter\Form\SettingsForm'
+   _title: 'Syntax highlighter settings'
+ requirements:
+   _permission: 'administer site configuration'
