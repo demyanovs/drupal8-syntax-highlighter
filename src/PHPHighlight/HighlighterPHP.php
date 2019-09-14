@@ -9,7 +9,7 @@ class HighlighterPHP extends HighlighterBase
 
     public static function getInstance(string $text) : self
     {
-        $text = str_replace('&lt;?php', '<?php', $text);
+        $text = htmlspecialchars_decode($text);
         self::setText($text);
         if (self::$_instance) {
             return self::$_instance;
