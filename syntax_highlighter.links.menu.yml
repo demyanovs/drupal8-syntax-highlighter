@@ -1,12 +1,10 @@
 syntax_highlighter.admin_config:
- title: 'Syntax highlighter'
- parent: system.admin_config
- route_name: syntax_highlighter.admin_config
- weight: -50
-
+  title: 'Syntax highlighter'
+  parent: system.admin_config
+  route_name: syntax_highlighter.admin_config
+  
 syntax_highlighter.admin_settings:
- title: 'SyntaxHighlighter settings'
- description: 'In this settings you can code highlighter settings.'
- parent: syntax_highlighter.admin_config
- route_name: syntax_highlighter.admin_settings
- weight: 1
+  title: 'SyntaxHighlighter settings'
+  description: 'In this settings you can code highlighter settings.'
+  parent: syntax_highlighter.admin_config
+  route_name: syntax_highlighter.admin_settings

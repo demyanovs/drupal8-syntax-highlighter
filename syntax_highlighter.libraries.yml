@@ -3,3 +3,5 @@ syntax_highlighter:
   css:
     theme:
       css/highlighter.css: {}
+  js:
+    js/highlighter.js: {}

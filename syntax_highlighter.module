@@ -13,14 +13,32 @@ use PHPHighlight\Highlighter;
  */
 function syntax_highlighter_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode)
 {
+    \Drupal::service('router.builder')->rebuild();
+    drupal_flush_all_caches();
+    \Drupal::service('router.builder')->rebuild();
     $config = \Drupal::config('syntax_highlighter.settings')->getOriginal('settings', FALSE);
-    $text = str_replace('&gt;', '>', $build['body'][0]['#text']);
+    $enabledContentTypes = \Drupal::config('syntax_highlighter.settings')->getOriginal('enabled_content_types', FALSE);
 
-    $highlighter = new Highlighter($text, 'railscasts');
+    $node = \Drupal::routeMatch()->getParameter('node');
+    if (!$node) {
+        // Not detail page
+        return false;
+    }
+
+    // Check content type
+    $typeName = $node->bundle();
+    if (!isset($enabledContentTypes[$typeName]) || $enabledContentTypes[$typeName] !== $typeName) {
+        return false;
+    }
+
+    $text = str_replace('&gt;', '>', $build['body'][0]['#text']);
+    $text = str_replace('&lt;?php', '<?php', $text);
+
+    $highlighter = new Highlighter($text, '');
     $highlighter->setShowLineNumbers(isset($config['show_line_numbers']) && $config['show_line_numbers'] ? true : false);
     $highlighter->setShowActionPanel(isset($config['show_action_panel']) && $config['show_action_panel'] ? true : false);
 
-    $build['body'][0]['#text'] = $highlighter->parse();;
+    $build['body'][0]['#text'] = $highlighter->parse();
 }
 
 /**

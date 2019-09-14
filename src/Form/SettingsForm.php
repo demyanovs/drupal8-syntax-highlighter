@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\syntax_highlighter\Form;
+
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -60,7 +61,7 @@ class SettingsForm extends ConfigFormBase
         $form['enabled_content_types'] = [
             '#type' => 'checkboxes',
             '#title' => 'Enabled Content Types',
-            '#description' => 'Use SyntaxHighlighter for all enabled content types only',
+            '#description' => 'Use SyntaxHighlighter for enabled content types only',
             '#options' => $content_types,
             '#default_value' => $config->get('enabled_content_types'),
         ];

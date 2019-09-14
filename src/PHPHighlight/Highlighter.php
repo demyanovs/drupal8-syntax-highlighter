@@ -2,70 +2,64 @@
 
 namespace PHPHighlight;
 
-use PHPHighlight\Theme\Theme;
+use PHPHighlight\Themes\Styles;
+use PHPHighlight\Themes\Theme;
 
-class Highlighter {
-
-    /**
-     * @var string
-     */
+class Highlighter
+{
+    /** @var string */
     protected static $_text;
 
+    /** @var bool */
     private $_showActionPanel = true;
 
+    /** @var bool */
     private $_showLineNumbers = false;
 
-    /**
-     * @var Theme
-     */
+    /** @var Theme */
     private $_theme;
 
-    /**
-     * Highlighter constructor.
-     * @param string $text
-     * @param string $theme
-     */
     public function __construct(string $text, string $theme = '')
     {
-        self::$_text = $text;
+        self::$_text  = str_replace('<?php', '&lt;?php', $text);
         $this->_theme = new Theme($theme);
     }
 
     /**
-     * @return null|string|string[]
+     * @return string|string[]|null
      */
     public function parse()
     {
         return preg_replace_callback(
             '/<pre([^>]+)>(.*?)<\/pre>/ism',
             function ($matches) {
-               preg_match_all('/data-(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?/ism', $matches[1], $attributes);
+                preg_match_all('/data-(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?/ism', $matches[1], $attributes);
                 $data = [];
                 foreach ($attributes[1] as $key => $attr) {
                     $data[$attr] = $attributes[2][$key];
                 }
                 $block = isset($matches[2]) ? trim($matches[2]) : '';
-                $lang = isset($data['lang']) ? $data['lang'] : '';
-                $file = isset($data['file']) ? $data['file'] : '';
-                $theme = isset($data['theme']) ? $data['theme'] : '';
+                $lang  = $data['lang'] ?? '';
+                $file  = $data['file'] ?? '';
+                $theme = $data['theme'] ?? '';
+
+                if (!$lang) {
+                    return str_replace('<?php', '&lt;?php', $block);
+                }
+
                 return $this->parseBlock($block, $lang, $file, $theme);
             },
-            self::$_text);
+            self::$_text
+        );
     }
 
-    /**
-     * @param string $block
-     * @param string $lang
-     * @param string $filePath
-     * @return mixed|string
-     */
-    private function parseBlock(string $block, string $lang, string $filePath = '', $theme = '')
+    private function parseBlock(string $block, string $lang, string $filePath = '', string $theme = '') : string
     {
-        if ($lang == "php") {
+        if ($lang === 'php') {
             $highlighter = HighlighterPHP::getInstance($block);
-        } elseif ($lang == "bash") {
+        } elseif ($lang === 'bash') {
             $highlighter = HighlighterBash::getInstance($block);
-        } elseif ($lang == "xml" || $lang == "html") {
+        } elseif ($lang === 'xml' || $lang === 'html') {
             $highlighter = HighlighterXML::getInstance($block);
         } else {
             $highlighter = HighlighterPHP::getInstance($block);
@@ -77,65 +71,57 @@ class Highlighter {
         }
 
         $block = $highlighter->highlight();
+
         return $this->wrapCode($block, $this->_theme::getBackgroundColor(), $filePath);
     }
 
-    /**
-     * @param string $text
-     * @param string $bgColor
-     * @param string $filePath
-     * @return string
-     */
-    private function wrapCode(string $text, string $bgColor = '', string $filePath = ''): string
+    private function wrapCode(string $text, string $bgColor = '', string $filePath = '') : string
     {
         $wrapper = '<div class="code-block-wrapper">';
         if ($this->_showActionPanel) {
             $wrapper .= '
-            <div class="meta">
-                <div class="actions">
-                    <span class="js-copy-clipboard copy-text" onclick="PHPHighlight.copyClipboard(this)">copy</span>
-                    <span class="meta-divider"></span>
+            <div class="meta" style="' . Styles::getCodeBlockWrapperMetaStyle() . '">
+                <div class="actions" style="' . Styles::getCodeBlockWrapperActionsStyle() . '">
+                    <span class="js-copy-clipboard copy-text" style="' . Styles::getCodeBlockWrapperCopyTextStyle() . '" onclick="PHPHighlight.copyClipboard(this)">copy</span>
+                    <span class="meta-divider" style="' . Styles::getCodeBlockWrapperMetaDividerStyle() . '"></span>
                 </div>
-                <div class="info">
-                    <span>'.$filePath.'</span>
+                <div class="info" style="' . Styles::getCodeBlockWrapperInfoStyle() . '">
+                    <span>' . $filePath . '</span>
                 </div>
             </div>';
         }
 
         $line_numbers = '';
-        $text = str_replace('<br />', PHP_EOL, $text);
+        $text         = str_replace('<br />', PHP_EOL, $text);
         if ($this->_showLineNumbers) {
             $line_numbers = $this->setLineNumbers(count(explode(PHP_EOL, $text)));
         }
-        $wrapper .= '<div class="code-highlighter" style="background-color: '.$bgColor.'">'.$line_numbers.'<div class="code-block">'.$text.'</div></div></div>';
+        $wrapper .= '<div class="code-highlighter" style="' . Styles::getCodeHighlighterStyle() . '; background-color: ' . $bgColor . '">' . $line_numbers . '<div class="code-block">' . $text . '</div></div></div>';
+
         return $wrapper;
     }
 
-    /**
-     * @param int $count
-     * @return string
-     */
-    private function setLineNumbers(int $count)
+    private function setLineNumbers(int $count) : string
     {
+        // Don't show line number if there is only one line
+        if ($count === 1) {
+            return false;
+        }
+
         $line_numbers = '';
         for ($i = 1; $i < $count+1; $i++) {
-            $line_numbers .= '<span class="line-number" style="color: '.$this->_theme::getDefaultColor().'">' . $i . '</span>';
+            $line_numbers .= '<span class="line-number" style="' . Styles::getLineNumberStyle() . '; color: ' . $this->_theme::getDefaultColor() . '">' . $i . '</span>';
         }
-        return '<div class="line-numbers">'.$line_numbers.'</div>';
+
+        return '<div class="line-numbers" style="' . Styles::getLineNumbersStyle() . '">' . $line_numbers . '</div>';
     }
 
-    /**
-     * @param bool $status
-     */
-    public function setShowActionPanel(bool $status)
+    public function setShowActionPanel(bool $status) : void
     {
         $this->_showActionPanel = $status;
     }
 
-    /**
-     * @param bool $status
-     */
-    public function setShowLineNumbers(bool $status)
+    public function setShowLineNumbers(bool $status) : void
     {
         $this->_showLineNumbers = $status;
     }
